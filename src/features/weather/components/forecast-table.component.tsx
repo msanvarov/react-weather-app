@@ -1,14 +1,13 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
-import type { ForecastEntry } from '@/features/weather/types/weather.types';
-import {
-  formatEntryDateTime,
-} from '@/features/weather/utils/forecast.util';
+import type { ForecastEntry } from "@/features/weather/types/weather.types";
+import { formatEntryDateTime } from "@/features/weather/utils/forecast.util";
+import { capitalise } from "@/features/weather/utils/text.util";
 import {
   formatCelsius,
   formatCelsiusPrecise,
   formatWind,
-} from '@/features/weather/utils/units.util';
+} from "@/features/weather/utils/units.util";
 
 export type ForecastTableProps = {
   entries: readonly ForecastEntry[];
@@ -24,7 +23,7 @@ const rowVariants = {
   }),
 };
 
-const headers = ['Date', 'Temp', 'Min Temp', 'Max Temp', 'Wind', 'Description'];
+const headers = ["Date", "Temp", "Min Temp", "Max Temp", "Wind", "Description"];
 
 export const ForecastTable = ({
   entries,
@@ -71,7 +70,7 @@ export const ForecastTable = ({
               {formatWind(entry.windSpeedMs)}
             </td>
             <td className="border-b border-surface-border/60 px-4 py-3 text-right text-ink">
-              {entry.condition.description}
+              {capitalise(entry.condition.description)}
             </td>
           </motion.tr>
         ))}
