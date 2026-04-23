@@ -1,18 +1,16 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
-import type { CurrentWeather } from '@/features/weather/types/weather.types';
+import type { CurrentWeather } from "@/features/weather/types/weather.types";
+import { capitalise } from "@/features/weather/utils/text.util";
 import {
   formatCelsius,
   formatHumidity,
   formatWind,
-} from '@/features/weather/utils/units.util';
+} from "@/features/weather/utils/units.util";
 
 export type CurrentWeatherProps = {
   data: CurrentWeather;
 };
-
-const capitalise = (value: string): string =>
-  value.length === 0 ? value : value[0]!.toUpperCase() + value.slice(1);
 
 const iconUrl = (icon: string) =>
   `https://openweathermap.org/img/wn/${icon}@2x.png`;
