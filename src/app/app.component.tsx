@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
-import { WeatherDashboard } from '@/features/weather/components/weather-dashboard.component';
+import { WeatherDashboard } from "@/features/weather/components/weather-dashboard.component";
 
 export const App = () => (
   <div className="relative min-h-screen overflow-hidden bg-surface text-ink">
@@ -37,8 +37,18 @@ export const App = () => (
         <WeatherDashboard />
       </motion.div>
 
-      <footer className="mt-16 flex items-center justify-between text-xs text-ink-faint">
-        <span>Weather App</span>
+      <footer className="mt-16 flex flex-col gap-2 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between">
+        <span>
+          Built by{" "}
+          <a
+            href="https://sal-anvarov.com"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium text-ink-muted underline-offset-4 transition-colors hover:text-ink hover:underline"
+          >
+            Sal Anvarov
+          </a>
+        </span>
         <a
           href="https://openweathermap.org/"
           target="_blank"
