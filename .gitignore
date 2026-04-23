@@ -7,10 +7,11 @@ dist
 dist-ssr
 *.local
 
-# Env files (local secrets only)
+# Env files (local secrets only — .env.test is checked in so tests run anywhere)
 .env
 .env.local
 .env.*.local
+!.env.test
 
 # Logs
 npm-debug.log*
