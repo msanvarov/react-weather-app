@@ -1,19 +1,20 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 
-import { Spinner } from '@/components/ui/spinner/spinner.component';
-import { StatusMessage } from '@/components/ui/status-message/status-message.component';
-import { useForecast } from '@/features/weather/hooks/use-forecast.hook';
-import { groupForecastByDay } from '@/features/weather/utils/forecast.util';
-import { ForecastDayTabs } from '@/features/weather/components/forecast-day-tabs.component';
-import { ForecastTable } from '@/features/weather/components/forecast-table.component';
+import { Spinner } from "@/components/ui/spinner/spinner.component";
+import { StatusMessage } from "@/components/ui/status-message/status-message.component";
+import { useForecast } from "@/features/weather/hooks/use-forecast.hook";
+import { groupForecastByDay } from "@/features/weather/utils/forecast.util";
+import { ForecastDayTabs } from "@/features/weather/components/forecast-day-tabs.component";
+import { ForecastTable } from "@/features/weather/components/forecast-table.component";
+import type { CityLocation } from "@/features/weather/types/city.types";
 
 export type ForecastPanelProps = {
-  cityId: number;
+  city: CityLocation;
 };
 
-export const ForecastPanel = ({ cityId }: ForecastPanelProps) => {
-  const { data, isPending, isError, error } = useForecast(cityId, true);
+export const ForecastPanel = ({ city }: ForecastPanelProps) => {
+  const { data, isPending, isError, error } = useForecast(city, true);
   const [activeDayKey, setActiveDayKey] = useState<string | null>(null);
 
   const days = useMemo(() => (data ? groupForecastByDay(data) : []), [data]);
@@ -39,7 +40,7 @@ export const ForecastPanel = ({ cityId }: ForecastPanelProps) => {
   return (
     <motion.section
       initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
+      animate={{ opacity: 1, height: "auto" }}
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
       className="overflow-hidden"
@@ -56,7 +57,9 @@ export const ForecastPanel = ({ cityId }: ForecastPanelProps) => {
           <StatusMessage
             tone="error"
             title="Couldn't load the forecast"
-            description={error instanceof Error ? error.message : 'Please try again.'}
+            description={
+              error instanceof Error ? error.message : "Please try again."
+            }
           />
         )}
 

@@ -1,12 +1,13 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import { env } from '@/config/env.config';
+import { env } from "@/config/env.config";
+import type { CityLocation } from "@/features/weather/types/city.types";
 import type {
   CurrentWeather,
   Forecast,
   ForecastEntry,
   WeatherCondition,
-} from '@/features/weather/types/weather.types';
+} from "@/features/weather/types/weather.types";
 
 const conditionSchema = z.object({
   id: z.number(),
@@ -16,7 +17,6 @@ const conditionSchema = z.object({
 });
 
 const currentWeatherResponseSchema = z.object({
-  id: z.number(),
   name: z.string(),
   dt: z.number(),
   timezone: z.number(),
@@ -44,7 +44,6 @@ const forecastEntrySchema = z.object({
 
 const forecastResponseSchema = z.object({
   city: z.object({
-    id: z.number(),
     name: z.string(),
     country: z.string(),
     timezone: z.number(),
@@ -62,25 +61,31 @@ export class WeatherApiError extends Error {
 
   constructor(message: string, status: number) {
     super(message);
-    this.name = 'WeatherApiError';
+    this.name = "WeatherApiError";
     this.status = status;
   }
 }
 
-const firstCondition = (list: z.infer<typeof conditionSchema>[]): WeatherCondition => {
+const firstCondition = (
+  list: z.infer<typeof conditionSchema>[],
+): WeatherCondition => {
   const [head] = list;
   if (!head) {
-    throw new WeatherApiError('Malformed weather payload: missing condition', 500);
+    throw new WeatherApiError(
+      "Malformed weather payload: missing condition",
+      500,
+    );
   }
   return head;
 };
 
 const toCurrentWeather = (
   raw: z.infer<typeof currentWeatherResponseSchema>,
+  fallbackName: string,
+  fallbackCountry: string,
 ): CurrentWeather => ({
-  cityId: raw.id,
-  cityName: raw.name,
-  country: raw.sys.country ?? '',
+  cityName: raw.name || fallbackName,
+  country: raw.sys.country ?? fallbackCountry,
   temperatureK: raw.main.temp,
   feelsLikeK: raw.main.feels_like,
   humidity: raw.main.humidity,
@@ -102,20 +107,27 @@ const toForecastEntry = (
   condition: firstCondition(raw.weather),
 });
 
-const toForecast = (raw: z.infer<typeof forecastResponseSchema>): Forecast => ({
-  cityId: raw.city.id,
-  cityName: raw.city.name,
-  country: raw.city.country,
+const toForecast = (
+  raw: z.infer<typeof forecastResponseSchema>,
+  fallbackName: string,
+  fallbackCountry: string,
+): Forecast => ({
+  cityName: raw.city.name || fallbackName,
+  country: raw.city.country || fallbackCountry,
   timezoneOffsetSeconds: raw.city.timezone,
   entries: raw.list.map(toForecastEntry),
 });
 
-const buildUrl = (path: string, params: Record<string, string>): string => {
-  const url = new URL(`${env.openWeatherApiUrl}${path}`);
+const buildUrl = (
+  base: string,
+  path: string,
+  params: Record<string, string>,
+): string => {
+  const url = new URL(`${base}${path}`);
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value);
   }
-  url.searchParams.set('appid', env.openWeatherApiKey);
+  url.searchParams.set("appid", env.openWeatherApiKey);
   return url.toString();
 };
 
@@ -129,7 +141,7 @@ const parseError = async (response: Response): Promise<string> => {
   } catch {
     // fall through to generic message
   }
-  return response.statusText || 'Unknown error';
+  return response.statusText || "Unknown error";
 };
 
 const request = async <T>(
@@ -149,27 +161,43 @@ const request = async <T>(
   const parsed = schema.safeParse(json);
   if (!parsed.success) {
     throw new WeatherApiError(
-      `Unexpected response shape: ${parsed.error.issues[0]?.message ?? 'validation failed'}`,
+      `Unexpected response shape: ${parsed.error.issues[0]?.message ?? "validation failed"}`,
       500,
     );
   }
   return parsed.data;
 };
 
+const locationParams = (city: CityLocation): Record<string, string> => ({
+  lat: String(city.lat),
+  lon: String(city.lon),
+});
+
 export const weatherProvider = {
   async getCurrentWeather(
-    cityId: number,
+    city: CityLocation,
     signal?: AbortSignal,
   ): Promise<CurrentWeather> {
-    const url = buildUrl('/weather', { id: String(cityId) });
+    const url = buildUrl(
+      env.openWeatherDataUrl,
+      "/weather",
+      locationParams(city),
+    );
     const raw = await request(url, currentWeatherResponseSchema, signal);
-    return toCurrentWeather(raw);
+    return toCurrentWeather(raw, city.name, city.country);
   },
 
-  async getForecast(cityId: number, signal?: AbortSignal): Promise<Forecast> {
-    const url = buildUrl('/forecast', { id: String(cityId) });
+  async getForecast(
+    city: CityLocation,
+    signal?: AbortSignal,
+  ): Promise<Forecast> {
+    const url = buildUrl(
+      env.openWeatherDataUrl,
+      "/forecast",
+      locationParams(city),
+    );
     const raw = await request(url, forecastResponseSchema, signal);
-    return toForecast(raw);
+    return toForecast(raw, city.name, city.country);
   },
 };
 

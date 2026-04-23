@@ -1,20 +1,22 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
-import { weatherProvider } from '@/features/weather/api/weather.provider';
+import { weatherProvider } from "@/features/weather/api/weather.provider";
+import {
+  cityKey,
+  type CityLocation,
+} from "@/features/weather/types/city.types";
 
-export const forecastQueryKey = (cityId: number) =>
-  ['weather', 'forecast', cityId] as const;
+export const forecastQueryKey = (city: CityLocation) =>
+  ["weather", "forecast", cityKey(city)] as const;
 
-export const useForecast = (cityId: number | null, enabled: boolean) =>
+export const useForecast = (city: CityLocation | null, enabled: boolean) =>
   useQuery({
-    queryKey: cityId === null ? ['weather', 'forecast', 'idle'] : forecastQueryKey(cityId),
+    queryKey: city ? forecastQueryKey(city) : ["weather", "forecast", "idle"],
     queryFn: ({ signal }) => {
-      if (cityId === null) {
-        throw new Error('City id is required');
-      }
-      return weatherProvider.getForecast(cityId, signal);
+      if (!city) throw new Error("City is required");
+      return weatherProvider.getForecast(city, signal);
     },
-    enabled: enabled && cityId !== null,
+    enabled: enabled && city !== null,
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   });
