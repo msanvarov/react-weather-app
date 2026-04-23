@@ -2,7 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_OPENWEATHER_API_KEY: string;
-  readonly VITE_OPENWEATHER_API_URL?: string;
+  readonly VITE_OPENWEATHER_API_HOST?: string;
 }
 
 interface ImportMeta {

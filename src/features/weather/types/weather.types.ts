@@ -6,7 +6,6 @@ export type WeatherCondition = {
 };
 
 export type CurrentWeather = {
-  readonly cityId: number;
   readonly cityName: string;
   readonly country: string;
   readonly temperatureK: number;
@@ -29,7 +28,6 @@ export type ForecastEntry = {
 };
 
 export type Forecast = {
-  readonly cityId: number;
   readonly cityName: string;
   readonly country: string;
   readonly timezoneOffsetSeconds: number;

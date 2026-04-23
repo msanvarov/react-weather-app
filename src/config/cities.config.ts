@@ -1,11 +1,11 @@
-export type City = {
-  readonly id: number;
-  readonly name: string;
-  readonly country: string;
-};
+import type { CityLocation } from "@/features/weather/types/city.types";
 
-export const CITIES: readonly City[] = [
-  { id: 6167865, name: 'Toronto', country: 'CA' },
-  { id: 6094817, name: 'Ottawa', country: 'CA' },
-  { id: 1850147, name: 'Tokyo', country: 'JP' },
+/**
+ * Suggested cities shown before the user begins typing in the search box.
+ * Coordinates resolved via OpenWeatherMap's geocoding API.
+ */
+export const SUGGESTED_CITIES: readonly CityLocation[] = [
+  { name: "Toronto", country: "CA", lat: 43.6534817, lon: -79.3839347 },
+  { name: "Ottawa", country: "CA", lat: 45.4208777, lon: -75.6901106 },
+  { name: "Tokyo", country: "JP", lat: 35.6828387, lon: 139.7594549 },
 ] as const;
