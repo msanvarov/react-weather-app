@@ -35,7 +35,7 @@ npm run dev                    # http://localhost:5173
 
 ## Project structure
 
-Inspired by [bulletproof-react](https://github.com/alan2207/bulletproof-react/tree/master/apps/react-vite). File suffixes make every file self-describing at a glance:
+File suffixes make every file self-describing at a glance:
 
 | Suffix             | Purpose                                              |
 | ------------------ | ---------------------------------------------------- |
